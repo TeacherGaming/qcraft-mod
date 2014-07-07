@@ -1,0 +1,41 @@
+tile.qcraft:ore.name=Quantum Ore
+tile.qcraft:odb.name=Observer Dependent Block
+tile.qcraft:odb_entangled.name=Entangled Block
+tile.qcraft:qb.name=Quantum Block
+tile.qcraft:qb_entangled.name=Entangled Quantum Block
+tile.qcraft:computer.name=Quantum Computer
+tile.qcraft:computer_entangled.name=Entangled Quantum Computer
+tile.qcraft:portal.name=Quantum Portal
+tile.qcraft:automatic_observer.name=Automatic Observer
+
+item.qcraft:dust.name=Quantum Dust
+item.qcraft:eos.name=Essence of Superposition
+item.qcraft:eoo.name=Essence of Observation
+item.qcraft:eoe.name=Essence of Entanglement
+item.qcraft:goggles.name=Quantum Goggles
+item.qcraft:ao_goggles.name=Anti-Observation Goggles
+
+gui.qcraft:computer.energize=Energize
+gui.qcraft:computer.deenergize=De-energize
+
+gui.qcraft:computer.local_portal=This Portal:
+gui.qcraft:computer.remote_portal=Destination Portal:
+gui.qcraft:computer.local_server=On This Server
+gui.qcraft:computer.remote_server=On "%s"
+gui.qcraft:computer.ok=OK
+
+gui.qcraft:computer.error_no_twin=No destination
+gui.qcraft:computer.error_frame_incomplete=Frame incomplete
+gui.qcraft:computer.error_destination_frame_incomplete=Destination frame incomplete
+gui.qcraft:computer.error_frame_mismatch=Frame mismatch
+gui.qcraft:computer.error_frame_obstructed=Frame obstructed
+gui.qcraft:computer.error_insufficient_cooling=Insufficient cooling
+gui.qcraft:computer.error_area_not_transportable=Area not transportable
+gui.qcraft:computer.error_destination_not_transportable=Destination not transportable
+gui.qcraft:computer.error_frame_deployed=Frame is energized
+gui.qcraft:computer.error_name_conflict=Portal name in use
+
+gui.qcraft:item_transfer.line1=Would you like to take your items with you to "%s"?
+gui.qcraft:item_transfer.line2=If the connection fails, re-join this server to get them back.
+
+gui.qcraft:standby.line1=Preparing for travel...

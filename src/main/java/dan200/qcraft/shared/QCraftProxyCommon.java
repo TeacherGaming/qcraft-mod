@@ -131,14 +131,14 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
 
         // Quantum ore blocks
         QCraft.Blocks.quantumOre = new BlockQuantumOre( false );
-        GameRegistry.registerBlock( QCraft.Blocks.quantumOre, "ore" );
+        GameRegistry.registerBlock( QCraft.Blocks.quantumOre, "quantumore" );
 
         QCraft.Blocks.quantumOreGlowing = new BlockQuantumOre( true );
-        GameRegistry.registerBlock( QCraft.Blocks.quantumOreGlowing, "lit_ore" );
+        GameRegistry.registerBlock( QCraft.Blocks.quantumOreGlowing, "quantumoreglowing" );
 
         // Quantum logic block
         QCraft.Blocks.quantumLogic = new BlockQuantumLogic();
-        GameRegistry.registerBlock( QCraft.Blocks.quantumLogic, ItemQuantumLogic.class, "logic" );
+        GameRegistry.registerBlock( QCraft.Blocks.quantumLogic, ItemQuantumLogic.class, "quantumlogic" );
 
         // qBlock block
         QCraft.Blocks.qBlock = new BlockQBlock();
@@ -146,11 +146,11 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
 
         // Quantum Computer block
         QCraft.Blocks.quantumComputer = new BlockQuantumComputer();
-        GameRegistry.registerBlock( QCraft.Blocks.quantumComputer, ItemQuantumComputer.class, "computer" );
+        GameRegistry.registerBlock( QCraft.Blocks.quantumComputer, ItemQuantumComputer.class, "quantumcomputer" );
 
         // Quantum Portal block
         QCraft.Blocks.quantumPortal = new BlockQuantumPortal();
-        GameRegistry.registerBlock( QCraft.Blocks.quantumPortal, "portal" );
+        GameRegistry.registerBlock( QCraft.Blocks.quantumPortal, "quantumportal" );
 
         // ITEMS
 
@@ -250,8 +250,8 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
     private void registerTileEntities()
     {
         // Tile Entities
-        GameRegistry.registerTileEntity( TileEntityQBlock.class, "qcraft:qblock" );
-        GameRegistry.registerTileEntity( TileEntityQuantumComputer.class, "qcraft:computer" );
+        GameRegistry.registerTileEntity( TileEntityQBlock.class, "qblock" );
+        GameRegistry.registerTileEntity( TileEntityQuantumComputer.class, "qcomputer" );
     }
 
     private void registerForgeHandlers()

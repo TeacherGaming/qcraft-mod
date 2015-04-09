@@ -540,7 +540,7 @@ public class TileEntityQuantumComputer extends TileEntity
 
     private Set<EntityItem> getEntityItemsInArea( AreaShape shape )
     {
-        AxisAlignedBB aabb = AxisAlignedBB.getAABBPool().getAABB(
+        AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(
                 (double) ( xCoord + shape.m_xMin ),
                 (double) ( yCoord + shape.m_yMin ),
                 (double) ( zCoord + shape.m_zMin ),
@@ -1474,7 +1474,7 @@ public class TileEntityQuantumComputer extends TileEntity
             if( location != null && isPortalDeployed( location ) )
             {
                 // Search for players
-                AxisAlignedBB aabb = AxisAlignedBB.getAABBPool().getAABB(
+                AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(
                     (double) ( location.m_xOrigin ),
                     (double) ( location.m_yOrigin ),
                     (double) ( location.m_zOrigin ),

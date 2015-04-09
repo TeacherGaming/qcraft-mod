@@ -74,7 +74,7 @@ public class QCraftCommand implements ICommand
             if( astring.length >= 2 )
             {
                 String targetPlayerName = astring[1];
-                targetPlayer = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername( targetPlayerName );
+                targetPlayer = MinecraftServer.getServer().getConfigurationManager().func_152612_a( targetPlayerName );
             }
             else
             {

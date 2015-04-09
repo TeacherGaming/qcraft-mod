@@ -320,7 +320,7 @@ public class BlockQBlock extends BlockSand
         // Add AABB if so
         if( solid )
         {
-            AxisAlignedBB aabb = AxisAlignedBB.getAABBPool().getAABB(
+            AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(
                     (double) x, (double) y, (double) z,
                     (double) x + 1.0, (double) y + 1.0, (double) z + 1.0
             );

@@ -3,8 +3,8 @@
   "modid": "qCraft",
   "name": "qCraft",
   "description": "Minecraft Rocks. Quantum Rules.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "1.2",
+  "mcversion": "1.7.10",
   "url": "http://www.qcraft.org",
   "updateUrl": "http://www.qcraft.org",
   "authors": [

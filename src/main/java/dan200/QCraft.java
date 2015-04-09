@@ -34,6 +34,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
@@ -344,7 +345,7 @@ public class QCraft
     {
         if( !player.worldObj.isRemote )
         {
-            return MinecraftServer.getServer().getConfigurationManager().isPlayerOpped( player.getCommandSenderName() );
+            return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
         }
         else
         {
@@ -656,9 +657,9 @@ public class QCraft
 
     private static LuggageVerificationResult verifyIncomingLuggage( EntityPlayer instigator, EntityPlayer entityPlayer, byte[] signedLuggageData, boolean forceVerify ) throws IOException
     {
-        NBTTagCompound signedLuggage = CompressedStreamTools.decompress( signedLuggageData );
+        NBTTagCompound signedLuggage = CompressedStreamTools.func_152457_a( signedLuggageData , NBTSizeTracker.field_152451_a);
         byte[] luggageData = signedLuggage.getByteArray("luggage");
-        NBTTagCompound luggage = CompressedStreamTools.decompress( luggageData );
+        NBTTagCompound luggage = CompressedStreamTools.func_152457_a(luggageData, NBTSizeTracker.field_152451_a);
 
         if( signedLuggage.hasKey( "key" ) )
         {
@@ -799,9 +800,9 @@ public class QCraft
             if( verificationResult != LuggageVerificationResult.UNTRUSTED )
             {
                 // Decompress the luggage
-                NBTTagCompound signedLuggage = CompressedStreamTools.decompress( signedLuggageData );
+                NBTTagCompound signedLuggage = CompressedStreamTools.func_152457_a(signedLuggageData, NBTSizeTracker.field_152451_a);
                 byte[] luggageData = signedLuggage.getByteArray( "luggage" );
-                NBTTagCompound luggage = CompressedStreamTools.decompress( luggageData );
+                NBTTagCompound luggage = CompressedStreamTools.func_152457_a(luggageData, NBTSizeTracker.field_152451_a);
 
                 // Unpack items
                 if( luggage.hasKey( "items" ) )

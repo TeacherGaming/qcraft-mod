@@ -314,17 +314,17 @@ public class TileEntityQBlock extends TileEntity
                         if( QCraft.enableQBlockOcclusionTesting )
                         {
                             // Do some occlusion tests
-                            Vec3 playerPos = worldObj.getWorldVec3Pool().getVecFromPool( centerX + x, centerY + y, centerZ + z );
+                            Vec3 playerPos = Vec3.createVectorHelper( centerX + x, centerY + y, centerZ + z );
                             boolean lineOfSightFound = false;
                             for( int side = 0; side < 6; ++side )
                             {
                                 // Only check faces that are facing the player
-                                Vec3 sideNormal = worldObj.getWorldVec3Pool().getVecFromPool(
+                                Vec3 sideNormal = Vec3.createVectorHelper(
                                         0.49 * Facing.offsetsXForSide[ side ],
                                         0.49 * Facing.offsetsYForSide[ side ],
                                         0.49 * Facing.offsetsZForSide[ side ]
                                 );
-                                Vec3 blockPos = worldObj.getWorldVec3Pool().getVecFromPool(
+                                Vec3 blockPos = Vec3.createVectorHelper(
                                         centerX + sideNormal.xCoord,
                                         centerY + sideNormal.yCoord,
                                         centerZ + sideNormal.zCoord

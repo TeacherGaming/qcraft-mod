@@ -298,6 +298,10 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
     public class ForgeHandlers implements
         IGuiHandler
     {
+        //vars for tracking last saved data to avoid unnecessary disk IOs during world save if data did not change
+        private NBTTagCompound currRootNbt = null;
+        private NBTTagCompound currEncrpytionNbt = null;
+        
         private ForgeHandlers()
         {
         }
@@ -358,10 +362,11 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
                 // Load NBT
                 NBTTagCompound rootnbt = loadNBTFromPath( getEntanglementSaveLocation( event.world ) );
                 NBTTagCompound encryptionnbt = loadNBTFromPath( getEncryptionSaveLocation( event.world ) );
-
+               
                 // Load from NBT
                 if( rootnbt != null )
                 {
+                    currRootNbt = rootnbt;
                     if( rootnbt.hasKey( "qblocks" ) )
                     {
                         NBTTagCompound qblocks = rootnbt.getCompoundTag( "qblocks" );
@@ -380,6 +385,7 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
                 }
                 if( encryptionnbt != null )
                 {
+                    currEncrpytionNbt = encryptionnbt;
                     if( encryptionnbt.hasKey( "encryption" ) )
                     {
                         NBTTagCompound encyption = encryptionnbt.getCompoundTag( "encryption" );
@@ -427,9 +433,15 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
                 EncryptionRegistry.Instance.writeToNBT( encrpytion );
                 encryptionnbt.setTag( "encryption", encrpytion );
 
-                // Save NBT
-                saveNBTToPath( getEntanglementSaveLocation( event.world ), rootnbt );
-                saveNBTToPath( getEncryptionSaveLocation( event.world ), encryptionnbt );
+                // Save NBT only if changed
+                if(!rootnbt.equals(currRootNbt)){
+                    saveNBTToPath( getEntanglementSaveLocation( event.world ), rootnbt );
+                    currRootNbt = rootnbt;
+                }
+                if(!encryptionnbt.equals(currEncrpytionNbt)){
+                    saveNBTToPath( getEncryptionSaveLocation( event.world ), encryptionnbt );
+                    currEncrpytionNbt = encryptionnbt;
+                }
             }
         }
 

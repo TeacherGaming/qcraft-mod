@@ -600,7 +600,6 @@ public class TileEntityQBlock extends TileEntity
             m_sideBlockTypes[ i ] = nbttagcompound.getInteger( "s" + i );
             m_forceObserved[ i ] = nbttagcompound.getBoolean( "c" + i );
         }
-        validate();
     }
 
     @Override

@@ -41,6 +41,7 @@ import java.util.Random;
 
 public class TileEntityQBlock extends TileEntity
 {
+    public boolean hasJustFallen; //tracks whether this block has just solidified from a falling block entity
     public static int FUZZ_TIME = 9;
 
     public static Random s_random = new Random();
@@ -79,6 +80,7 @@ public class TileEntityQBlock extends TileEntity
 
     public TileEntityQBlock()
     {
+        hasJustFallen = false;
         m_entanglementFrequency = -1;
         m_sideBlockTypes = new int[ 6 ];
         m_forceObserved = new boolean[ 6 ];
@@ -599,6 +601,11 @@ public class TileEntityQBlock extends TileEntity
         {
             m_sideBlockTypes[ i ] = nbttagcompound.getInteger( "s" + i );
             m_forceObserved[ i ] = nbttagcompound.getBoolean( "c" + i );
+        }
+        
+        if (hasJustFallen) {
+            validate(); //to re-entangle Quantum blocks that have just solidified from a falling block entity
+            hasJustFallen = false; //to prevent all kinds of problems
         }
     }
 

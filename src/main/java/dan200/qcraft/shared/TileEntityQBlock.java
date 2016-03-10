@@ -446,6 +446,7 @@ public class TileEntityQBlock extends TileEntity
     {
         // Get observer votes from entangled twins
         int[] votes = new int[ 6 ];
+        //[copied to the readFromNBT method]
         if( m_entanglementFrequency >= 0 )
         {
             List<TileEntityQBlock> twins = getEntanglementRegistry().getEntangledObjects( m_entanglementFrequency );
@@ -457,6 +458,7 @@ public class TileEntityQBlock extends TileEntity
                     TileEntityQBlock twin = it.next();
                     if( twin != this )
                     {
+                        //[/copied]
                         if( twin.m_currentlyObserved && twin.m_timeLastUpdated == currentTime )
                         {
                             // If an entangled twin is already up to date, use its result
@@ -605,6 +607,28 @@ public class TileEntityQBlock extends TileEntity
         
         if (hasJustFallen) {
             validate(); //to re-entangle Quantum blocks that have just solidified from a falling block entity
+                        
+            //[copied from the getObservationResult method]
+            if( m_entanglementFrequency >= 0 ) // force-updates blocks to the state of the rest of their entanglement group (this is a very crude implementation
+            {
+                List<TileEntityQBlock> twins = getEntanglementRegistry().getEntangledObjects( m_entanglementFrequency );
+                if( twins != null )
+                {
+                 Iterator<TileEntityQBlock> it = twins.iterator();
+                    while( it.hasNext() )
+                    {
+                        TileEntityQBlock twin = it.next();
+                        if( twin != this )
+                        {
+                            //[/copied]
+                            setDisplayedSide(false, twin.isForceObserved(1), twin.m_currentlyForcedSide );
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            
             hasJustFallen = false; //to prevent all kinds of problems
         }
     }

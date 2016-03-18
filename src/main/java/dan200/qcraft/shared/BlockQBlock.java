@@ -645,6 +645,16 @@ public class BlockQBlock extends BlockSand
         // Prevent the falling qBlock from dropping items
         entityFallingSand.field_145813_c = false; // dropItems
     }
+    
+    @Override
+    public void func_149828_a(World world, int x, int y, int z, int p) // onStopFalling
+    {        
+        TileEntity entity = world.getTileEntity(x, y, z);        
+        if (entity != null && entity instanceof TileEntityQBlock) {
+            TileEntityQBlock qBlock = (TileEntityQBlock) entity;
+            qBlock.hasJustFallen = true;
+        }
+    }
 
     @Override
     public boolean canProvidePower()

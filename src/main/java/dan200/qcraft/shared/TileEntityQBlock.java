@@ -41,6 +41,7 @@ import java.util.Random;
 
 public class TileEntityQBlock extends TileEntity
 {
+    public boolean hasJustFallen; //tracks whether this block has just solidified from a falling block entity
     public static int FUZZ_TIME = 9;
 
     public static Random s_random = new Random();
@@ -79,6 +80,7 @@ public class TileEntityQBlock extends TileEntity
 
     public TileEntityQBlock()
     {
+        hasJustFallen = false;
         m_entanglementFrequency = -1;
         m_sideBlockTypes = new int[ 6 ];
         m_forceObserved = new boolean[ 6 ];
@@ -444,6 +446,7 @@ public class TileEntityQBlock extends TileEntity
     {
         // Get observer votes from entangled twins
         int[] votes = new int[ 6 ];
+        //[copied to the readFromNBT method]
         if( m_entanglementFrequency >= 0 )
         {
             List<TileEntityQBlock> twins = getEntanglementRegistry().getEntangledObjects( m_entanglementFrequency );
@@ -455,6 +458,7 @@ public class TileEntityQBlock extends TileEntity
                     TileEntityQBlock twin = it.next();
                     if( twin != this )
                     {
+                        //[/copied]
                         if( twin.m_currentlyObserved && twin.m_timeLastUpdated == currentTime )
                         {
                             // If an entangled twin is already up to date, use its result
@@ -599,6 +603,33 @@ public class TileEntityQBlock extends TileEntity
         {
             m_sideBlockTypes[ i ] = nbttagcompound.getInteger( "s" + i );
             m_forceObserved[ i ] = nbttagcompound.getBoolean( "c" + i );
+        }
+        
+        if (hasJustFallen) {
+            validate(); //to re-entangle Quantum blocks that have just solidified from a falling block entity
+                        
+            //[copied from the getObservationResult method]
+            if( m_entanglementFrequency >= 0 ) // force-updates blocks to the state of the rest of their entanglement group (this is a very crude implementation
+            {
+                List<TileEntityQBlock> twins = getEntanglementRegistry().getEntangledObjects( m_entanglementFrequency );
+                if( twins != null )
+                {
+                 Iterator<TileEntityQBlock> it = twins.iterator();
+                    while( it.hasNext() )
+                    {
+                        TileEntityQBlock twin = it.next();
+                        if( twin != this )
+                        {
+                            //[/copied]
+                            setDisplayedSide(false, twin.isForceObserved(1), twin.m_currentlyForcedSide );
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            
+            hasJustFallen = false; //to prevent all kinds of problems
         }
     }
 

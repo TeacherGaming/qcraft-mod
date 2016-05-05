@@ -237,7 +237,7 @@ public class TileEntityQuantumComputer extends TileEntity
     {
         if( m_entanglementFrequency >= 0 )
         {
-            getEntanglementRegistry().register( m_entanglementFrequency, this );
+            getEntanglementRegistry().register( m_entanglementFrequency, this, this.getWorldObj() );
         }
     }
 
@@ -245,7 +245,7 @@ public class TileEntityQuantumComputer extends TileEntity
     {
         if( m_entanglementFrequency >= 0 )
         {
-            getEntanglementRegistry().unregister( m_entanglementFrequency, this );
+            getEntanglementRegistry().unregister( m_entanglementFrequency, this, this.getWorldObj() );
         }
     }
 
@@ -838,6 +838,7 @@ public class TileEntityQuantumComputer extends TileEntity
             {
                 m_portalNameConflict = false;
             }
+            EntanglementSavedData.get(this.getWorldObj()).markDirty(); //Notify that this needs to be saved on world save
         }
     }
 
@@ -848,6 +849,7 @@ public class TileEntityQuantumComputer extends TileEntity
             if( !m_portalNameConflict )
             {
                 getPortalRegistry().unregister( m_portalID );
+                EntanglementSavedData.get(this.getWorldObj()).markDirty(); //Notify that this needs to be saved on world save
             }
             m_portalNameConflict = false;
         }

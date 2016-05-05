@@ -22,6 +22,7 @@ import dan200.qcraft.shared.QCraftProxyCommon;
 import dan200.qcraft.shared.TileEntityQuantumComputer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 public class QCraftProxyServer extends QCraftProxyCommon
@@ -98,5 +99,10 @@ public class QCraftProxyServer extends QCraftProxyCommon
 
     private void registerForgeHandlers()
     {
+    }
+
+    @Override
+    public World getDefWorld() {
+        return MinecraftServer.getServer().worldServerForDimension(0); //gets the server world dim 0 handler
     }
 }

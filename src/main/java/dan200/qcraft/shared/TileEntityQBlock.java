@@ -112,7 +112,7 @@ public class TileEntityQBlock extends TileEntity
         super.validate();
         if( m_entanglementFrequency >= 0 )
         {
-            getEntanglementRegistry().register( m_entanglementFrequency, this );
+            getEntanglementRegistry().register( m_entanglementFrequency, this, this.getWorldObj() );
         }
     }
 
@@ -121,7 +121,7 @@ public class TileEntityQBlock extends TileEntity
     {
         if( m_entanglementFrequency >= 0 )
         {
-            getEntanglementRegistry().unregister( m_entanglementFrequency, this );
+            getEntanglementRegistry().unregister( m_entanglementFrequency, this, this.getWorldObj() );
         }
         super.invalidate();
     }
@@ -142,12 +142,12 @@ public class TileEntityQBlock extends TileEntity
         {
             if( m_entanglementFrequency >= 0 )
             {
-                getEntanglementRegistry().unregister( m_entanglementFrequency, this );
+                getEntanglementRegistry().unregister( m_entanglementFrequency, this, this.getWorldObj() );
             }
             m_entanglementFrequency = frequency;
             if( m_entanglementFrequency >= 0 )
             {
-                getEntanglementRegistry().register( m_entanglementFrequency, this );
+                getEntanglementRegistry().register( m_entanglementFrequency, this, this.getWorldObj() );
             }
         }
     }

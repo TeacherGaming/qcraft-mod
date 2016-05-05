@@ -43,4 +43,6 @@ public interface IQCraftProxy
 
     public void renderQuantumGogglesOverlay( float width, float height );
     public void renderAOGogglesOverlay( float width, float height );
+
+    public World getDefWorld();
 }

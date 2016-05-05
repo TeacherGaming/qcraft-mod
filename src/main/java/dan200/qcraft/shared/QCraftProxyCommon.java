@@ -23,7 +23,6 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import dan200.QCraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -37,17 +36,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent.Load;
-import net.minecraftforge.event.world.WorldEvent.Save;
-import net.minecraftforge.event.world.WorldEvent.Unload;
 import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import java.io.*;
 
 import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPED;
-import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS;
 
 public abstract class QCraftProxyCommon implements IQCraftProxy
 {
@@ -270,38 +263,9 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
         FMLCommonHandler.instance().bus().register( connectionHandler );
     }
 
-    private File getWorldSaveLocation( World world, String subPath )
-    {
-        File rootDir = FMLCommonHandler.instance().getMinecraftServerInstance().getFile( "." );
-        File saveDir = null;
-        if( QCraft.isServer() )
-        {
-            saveDir = new File( rootDir, world.getSaveHandler().getWorldDirectoryName() );
-        }
-        else
-        {
-            saveDir = new File( rootDir, "saves/" + world.getSaveHandler().getWorldDirectoryName() );
-        }
-        return new File( saveDir, subPath );
-    }
-
-    private File getEntanglementSaveLocation( World world )
-    {
-        return getWorldSaveLocation( world, "quantum/entanglements.bin" );
-    }
-
-    private File getEncryptionSaveLocation( World world )
-    {
-        return getWorldSaveLocation( world, "quantum/encryption.bin" );
-    }
-
     public class ForgeHandlers implements
         IGuiHandler
     {
-        //vars for tracking last saved data to avoid unnecessary disk IOs during world save if data did not change
-        private NBTTagCompound currRootNbt = null;
-        private NBTTagCompound currEncrpytionNbt = null;
-        
         private ForgeHandlers()
         {
         }
@@ -347,103 +311,6 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
         }
 
         // Forge event responses
-
-        @SubscribeEvent
-        public void onWorldLoad( Load event )
-        {
-            if( !event.world.isRemote )
-            {
-                // Reset
-                TileEntityQBlock.QBlockRegistry.reset();
-                TileEntityQuantumComputer.ComputerRegistry.reset();
-                PortalRegistry.PortalRegistry.reset();
-                EncryptionRegistry.Instance.reset();
-
-                // Load NBT
-                NBTTagCompound rootnbt = loadNBTFromPath( getEntanglementSaveLocation( event.world ) );
-                NBTTagCompound encryptionnbt = loadNBTFromPath( getEncryptionSaveLocation( event.world ) );
-               
-                // Load from NBT
-                if( rootnbt != null )
-                {
-                    currRootNbt = rootnbt;
-                    if( rootnbt.hasKey( "qblocks" ) )
-                    {
-                        NBTTagCompound qblocks = rootnbt.getCompoundTag( "qblocks" );
-                        TileEntityQBlock.QBlockRegistry.readFromNBT( qblocks );
-                    }
-                    if( rootnbt.hasKey( "qcomputers" ) )
-                    {
-                        NBTTagCompound qcomputers = rootnbt.getCompoundTag( "qcomputers" );
-                        TileEntityQuantumComputer.ComputerRegistry.readFromNBT( qcomputers );
-                    }
-                    if( rootnbt.hasKey( "portals" ) )
-                    {
-                        NBTTagCompound portals = rootnbt.getCompoundTag( "portals" );
-                        PortalRegistry.PortalRegistry.readFromNBT( portals );
-                    }
-                }
-                if( encryptionnbt != null )
-                {
-                    currEncrpytionNbt = encryptionnbt;
-                    if( encryptionnbt.hasKey( "encryption" ) )
-                    {
-                        NBTTagCompound encyption = encryptionnbt.getCompoundTag( "encryption" );
-                        EncryptionRegistry.Instance.readFromNBT( encyption );
-                    }
-                }
-            }
-        }
-
-        @SubscribeEvent
-        public void onWorldUnload( Unload event )
-        {
-            if( !event.world.isRemote )
-            {
-                // Reset
-                TileEntityQBlock.QBlockRegistry.reset();
-                TileEntityQuantumComputer.ComputerRegistry.reset();
-                PortalRegistry.PortalRegistry.reset();
-                EncryptionRegistry.Instance.reset();
-            }
-        }
-
-        @SubscribeEvent
-        public void onWorldSave( Save event )
-        {
-            if( !event.world.isRemote )
-            {
-                // Write to NBT
-                NBTTagCompound rootnbt = new NBTTagCompound();
-                NBTTagCompound encryptionnbt = new NBTTagCompound();
-
-                NBTTagCompound qblocks = new NBTTagCompound();
-                TileEntityQBlock.QBlockRegistry.writeToNBT( qblocks );
-                rootnbt.setTag( "qblocks", qblocks );
-
-                NBTTagCompound qcomputers = new NBTTagCompound();
-                TileEntityQuantumComputer.ComputerRegistry.writeToNBT( qcomputers );
-                rootnbt.setTag( "qcomputers", qcomputers );
-
-                NBTTagCompound portals = new NBTTagCompound();
-                PortalRegistry.PortalRegistry.writeToNBT( portals );
-                rootnbt.setTag( "portals", portals );
-
-                NBTTagCompound encrpytion = new NBTTagCompound();
-                EncryptionRegistry.Instance.writeToNBT( encrpytion );
-                encryptionnbt.setTag( "encryption", encrpytion );
-
-                // Save NBT only if changed
-                if(!rootnbt.equals(currRootNbt)){
-                    saveNBTToPath( getEntanglementSaveLocation( event.world ), rootnbt );
-                    currRootNbt = rootnbt;
-                }
-                if(!encryptionnbt.equals(currEncrpytionNbt)){
-                    saveNBTToPath( getEncryptionSaveLocation( event.world ), encryptionnbt );
-                    currEncrpytionNbt = encryptionnbt;
-                }
-            }
-        }
 
         @SubscribeEvent
         public void onPlayerLogin( PlayerEvent.PlayerLoggedInEvent event )

@@ -17,6 +17,7 @@ limitations under the License.
 
 package dan200;
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -193,6 +194,8 @@ public class QCraft
     public void serverLoad( FMLServerStartingEvent event )
     {
         event.registerServerCommand( new QCraftCommand() );
+        EncryptionSavedData.get(getDefWorld()); //trigger load of inter-server portal validations from disk to memory
+        EntanglementSavedData.get(getDefWorld()); //trigger load of entanglements and portals from disk to memory
     }
 
     public static boolean isClient()
@@ -202,7 +205,11 @@ public class QCraft
 
     public static boolean isServer()
     {
-        return !proxy.isClient();
+        return !isClient();
+    }
+
+    public static World getDefWorld() {
+        return proxy.getDefWorld(); //gets the server or client world dim 0 handler
     }
 
     public static void openQuantumComputerGUI( EntityPlayer player, TileEntityQuantumComputer computer )
@@ -506,6 +513,7 @@ public class QCraft
                         if( name != null && address != null )
                         {
                             PortalRegistry.PortalRegistry.registerServer( name, address );
+                            EntanglementSavedData.get(world).markDirty(); //Notify that this needs to be saved on world save
                         }
                     }
                     TileEntityQuantumComputer computer = (TileEntityQuantumComputer) entity;
@@ -689,6 +697,7 @@ public class QCraft
                             "Portal Link verified"
                         ) );
                     }
+                    EncryptionSavedData.get(getDefWorld()).markDirty(); //Notify that this needs to be saved on world save
                 }
                 else
                 {
@@ -770,6 +779,7 @@ public class QCraft
                 return LuggageVerificationResult.UNTRUSTED;
             }
             EncryptionRegistry.Instance.getReceivedLuggageIDs().add( uuid );
+            EncryptionSavedData.get(getDefWorld()).markDirty(); //Notify that this needs to be saved on world save
 
             // We're ok
             QCraft.requestDiscardLuggage( entityPlayer, signedLuggageData );
@@ -944,14 +954,6 @@ public class QCraft
 
     public static void log( String text )
     {
-        MinecraftServer server = MinecraftServer.getServer();
-        if( server != null && !proxy.isClient() )
-        {
-            server.logInfo( "[qCraft] " + text );
-        }
-        else
-        {
-            System.out.println( "[qCraft] " + text );
-        }
+        FMLLog.info("[qCraft] " + text, 0); //Use FML logger instead of Vanilla MC log
     }
 }

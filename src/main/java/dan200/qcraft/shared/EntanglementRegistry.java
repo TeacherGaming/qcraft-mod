@@ -23,12 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.world.World;
 
 public class EntanglementRegistry<T>
 {
     // Privates
     private int m_nextUnusedFrequency;
-    private Map<Integer, List<T>> m_entanglements;
+    private final Map<Integer, List<T>> m_entanglements;
 
     // Methods
     public EntanglementRegistry()
@@ -60,7 +61,7 @@ public class EntanglementRegistry<T>
         return freq;
     }
 
-    public void register( int frequency, T entangledObject )
+    public void register( int frequency, T entangledObject, World world )
     {
         if( !m_entanglements.containsKey( frequency ) )
         {
@@ -71,13 +72,15 @@ public class EntanglementRegistry<T>
             }
         }
         m_entanglements.get( frequency ).add( entangledObject );
+        EntanglementSavedData.get(world).markDirty(); //Notify that this needs to be saved on world save
     }
 
-    public void unregister( int frequency, T entangledObject )
+    public void unregister( int frequency, T entangledObject, World world )
     {
         if( m_entanglements.containsKey( frequency ) )
         {
             m_entanglements.get( frequency ).remove( entangledObject );
+            EntanglementSavedData.get(world).markDirty(); //Notify that this needs to be saved on world save
         }
     }
 

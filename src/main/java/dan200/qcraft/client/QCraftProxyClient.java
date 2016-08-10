@@ -28,9 +28,6 @@ import dan200.qcraft.shared.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.multiplayer.GuiConnecting;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -168,6 +165,11 @@ public class QCraftProxyClient extends QCraftProxyCommon
         QBlockRenderingHandler qBlockHandler = new QBlockRenderingHandler();
         MinecraftForgeClient.registerItemRenderer( Item.getItemFromBlock( QCraft.Blocks.qBlock ), qBlockHandler );
         RenderingRegistry.registerBlockHandler( qBlockHandler );
+    }
+
+    @Override
+    public World getDefWorld() {
+        return Minecraft.getMinecraft().getIntegratedServer().worldServerForDimension(0); //gets the client world dim 0 handler
     }
 
     public class ForgeHandlers

@@ -1,0 +1,4 @@
+.gradle/
+.nb-gradle/
+/eclipse/
+/build/

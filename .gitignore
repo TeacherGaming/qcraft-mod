@@ -2,3 +2,4 @@
 .nb-gradle/
 /eclipse/
 /build/
+gradle.properties

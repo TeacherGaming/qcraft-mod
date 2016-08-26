@@ -968,13 +968,6 @@ public class TileEntityQuantumComputer extends TileEntity
         public int m_z1;
         public int m_z2;
         
-        //public int m_xOrigin;
-        //public int m_yOrigin;
-        //public int m_zOrigin;
-        //public int m_xLength;
-        //public int m_yLength;
-        //public int m_zLength;
-        
         private PortalLocation(int x1, int y1, int z1, int x2, int y2, int z2, int id) {
             m_dimensionID = id;
             m_x1 = x1;
@@ -985,14 +978,6 @@ public class TileEntityQuantumComputer extends TileEntity
             m_z2 = z2;
         }
         
-        public int getDirection() {
-            if (m_x1 == m_x2) { //portal is standing on the x-axis, (east to west)
-                return 2; //portal and gold blocks are facing north and south
-            } else { // z1 == z2
-                return 4;
-            }
-        }
-
         public NBTTagCompound encode()
         {
             NBTTagCompound nbttagcompound = new NBTTagCompound();

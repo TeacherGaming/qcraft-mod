@@ -17,12 +17,15 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.2.2-a1"
+ext.modversion = "1.2.2-a1"
+ext.mcversion = "1.7.10"
+ext.forgeversion = "10.13.4.1614"
+version = mcversion + "-" + modversion
 group = "dan200.qcraft"
 archivesBaseName = "qCraft"
 
 minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
+    version = mcversion + "-" + forgeversion + "-" + mcversion
     runDir = "run"
     replace '${version}', project.version
 }

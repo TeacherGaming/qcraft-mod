@@ -34,6 +34,7 @@ gui.qcraft:computer.error_area_not_transportable=Area not transportable
 gui.qcraft:computer.error_destination_not_transportable=Destination not transportable
 gui.qcraft:computer.error_frame_deployed=Frame is energized
 gui.qcraft:computer.error_name_conflict=Portal name in use
+gui.qcraft:computer.error_multiple_possible_portals_found=Multiple possible portals found
 
 gui.qcraft:item_transfer.line1=Would you like to take your items with you to "%s"?
 gui.qcraft:item_transfer.line2=If the connection fails, re-join this server to get them back.

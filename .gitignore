@@ -1,5 +1,5 @@
 .gradle/
 .nb-gradle/
-/eclipse/
+/run/
 /build/
 gradle.properties

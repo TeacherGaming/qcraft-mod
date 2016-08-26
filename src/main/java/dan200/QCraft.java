@@ -74,6 +74,7 @@ public class QCraft
     public static boolean letPlayersEditPortalServerList = false;
     public static boolean letAdminsVerifyPortalServers = true;
     public static boolean letPlayersVerifyPortalServers = false;
+    public static int maxPortalSize = 5;
 
     // Blocks and Items
     public static class Blocks
@@ -171,6 +172,19 @@ public class QCraft
         prop = config.get( Configuration.CATEGORY_GENERAL, "letPlayersVerifyPortalServers", letPlayersVerifyPortalServers );
         prop.comment = "Set whether players can verify an inter-server portal link";
         letPlayersVerifyPortalServers = prop.getBoolean( letPlayersVerifyPortalServers );
+        
+        prop = config.get( Configuration.CATEGORY_GENERAL, "maxPortalSize", maxPortalSize );
+        prop.comment = "Set the maximum height and width for the Quantum Portal inside the frame in blocks. [min: 3, max: 16, def: 5]";
+        int temp = prop.getInt( maxPortalSize );
+        if (temp < 3) {
+            maxPortalSize = 3;
+            prop.set(maxPortalSize);
+        } else if (temp > 16) {
+            maxPortalSize = 16;
+            prop.set(maxPortalSize);
+        } else {
+            maxPortalSize = prop.getInt( maxPortalSize );
+        }            
 
         // None
 

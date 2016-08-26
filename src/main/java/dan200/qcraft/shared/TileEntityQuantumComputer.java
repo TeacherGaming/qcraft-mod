@@ -52,7 +52,7 @@ public class TileEntityQuantumComputer extends TileEntity
     public static final EntanglementRegistry<TileEntityQuantumComputer> ComputerRegistry = new EntanglementRegistry<TileEntityQuantumComputer>();
     public static final EntanglementRegistry<TileEntityQuantumComputer> ClientComputerRegistry = new EntanglementRegistry<TileEntityQuantumComputer>();
     public static final int RANGE = 8;
-    private final int maxPortalSize = 10;
+    private static boolean tooManyPossiblePortals = false;
 
     public static EntanglementRegistry<TileEntityQuantumComputer> getEntanglementRegistry( World world )
     {
@@ -689,7 +689,8 @@ public class TileEntityQuantumComputer extends TileEntity
         AreaNotTransportable,
         DestinationNotTransportable,
         FrameDeployed,
-        NameConflict;
+        NameConflict,
+        MultiplePossiblePortalsFound;
 
         public static String decode( TeleportError error )
         {
@@ -1121,7 +1122,7 @@ public class TileEntityQuantumComputer extends TileEntity
                 int tempX = x;
                 int tempY = y;
                 int tempZ = z;
-                for (int i = 0; i < maxPortalSize; i++) { // maximum portal size
+                for (int i = 0; i < QCraft.maxPortalSize + 1; i++) { // maximum portal size
                     tempX += Facing.offsetsXForSide[ dir ];
                     tempY += Facing.offsetsYForSide[ dir ];
                     tempZ += Facing.offsetsZForSide[ dir ];
@@ -1136,7 +1137,9 @@ public class TileEntityQuantumComputer extends TileEntity
                 } else { // every second corner
                     if (dir < 2) { //if direction of search was up/down
                         for (int i = 0; i<2; i++) {
-                            if (isPortalCorner(tempX, tempY, tempZ, (i+1)*2) && isPortalCorner(x1, y1, z1, (i+1)*2)) {
+                            if (isPortalCorner(tempX, tempY, tempZ, (i+1)*2) &&
+                                    isPortalCorner(x1, y1, z1, (i+1)*2) &&
+                                    Math.abs(tempY-y1) < QCraft.maxPortalSize + 2) { //+2: +1 for the extra corner block and +1 for the "<" boolean operator
                                 int[] temp = {tempX, tempY, tempZ, x1, y1, z1, (i+1)*2};
                                 possibleCornerPairs.add(temp);
                                 break;
@@ -1144,7 +1147,10 @@ public class TileEntityQuantumComputer extends TileEntity
                         }
                     } else { //if search direction was sideways
                         int perpenDir = ((dir - 1) % 4) + 2;
-                        if (isPortalCorner(tempX, tempY, tempZ, perpenDir) && isPortalCorner(x1, y1, z1, perpenDir)) {
+                        if (isPortalCorner(tempX, tempY, tempZ, perpenDir) &&
+                                isPortalCorner(x1, y1, z1, perpenDir) &&
+                                Math.abs(tempX-x1) < QCraft.maxPortalSize + 2 &&
+                                Math.abs(tempZ-z1) < QCraft.maxPortalSize + 2) {
                             int[] temp = {tempX, tempY, tempZ, x1, y1, z1, perpenDir};
                             possibleCornerPairs.add(temp);
                         }
@@ -1159,7 +1165,7 @@ public class TileEntityQuantumComputer extends TileEntity
                 int tempX = x;
                 int tempY = y;
                 int tempZ = z;
-                for (int i = 0; i < maxPortalSize; i++) { // maximum portal size
+                for (int i = 0; i < QCraft.maxPortalSize + 1; i++) { // maximum portal size
                     tempX += Facing.offsetsXForSide[ dir ];
                     tempY += Facing.offsetsYForSide[ dir ];
                     tempZ += Facing.offsetsZForSide[ dir ];
@@ -1192,7 +1198,7 @@ public class TileEntityQuantumComputer extends TileEntity
                 }                
             }
         }
-        return returnValue; //contains 0 up to 16 portal locations
+        return returnValue; //contains 0 up to 6 portal locations
     }
     
     private ArrayList<PortalLocation> findRestOfPortal(int[] cornerPair) {
@@ -1204,12 +1210,13 @@ public class TileEntityQuantumComputer extends TileEntity
         int y2 = cornerPair[4];
         int z2 = cornerPair[5];
         int lookDir = cornerPair[6]; //direction the portal should be looking
+        int searchDir = ((lookDir - (lookDir % 2)) % 4) + 2; //converts {2, 3, 4, 5} to {4, 4, 2, 2}
         if (Math.abs(y1 - y2) < 4 && (Math.abs(x1 - x2) < 3) && (Math.abs(z1 - z2) < 3)) { //if the portal would be too small if this pair of corners would make a portal
             return null;
         } else  if (y1 == y2){ //both corners and the glass between them would form the upper OR lower portal border
             for (int dir = 0; dir < 2; dir++) {
                 int tempY = y2;
-                for (int i = 0; i < maxPortalSize; i++) { //check for maximal portal size
+                for (int i = 0; i < QCraft.maxPortalSize + 1; i++) { //check for maximal portal size
                     tempY += Facing.offsetsYForSide[ dir ];
                     if (!isGlass(x1, tempY, z1) || !isGlass(x2, tempY,z2)) { //once connected glass stops
                         break;
@@ -1219,26 +1226,50 @@ public class TileEntityQuantumComputer extends TileEntity
                     continue;
                 }
                 if (isPortalCorner(x1, tempY, z1, lookDir) && isPortalCorner(x2, tempY, z2, lookDir)) {
-                    returnValue.add(new PortalLocation(x1, y1, z1, x2, tempY, z2, worldObj.provider.dimensionId));
+                    int c1;
+                    int c2;
+                    if (x1 == x2) {
+                        c1 = z1;
+                        c2 = z2;
+                    } else {
+                        c1 = x1;
+                        c2 = x2;
+                    }
+                    //check for completeness of last horizontal border.
+                    for(int i = Math.min(c1, c2) + 1; i < Math.max(c1, c2); i++ ) {
+                        if (!isGlass((x1 == x2) ? x1 : i, tempY, (z1 == z2) ? z1 : i )) {
+                            break;
+                        }
+                        if (i == Math.max(c1, c2) - 1) {
+                            returnValue.add(new PortalLocation(x1, y1, z1, x2, tempY, z2, worldObj.provider.dimensionId));
+                        }
+                    }
                 }
             }
         } else { //if the z and x coordinates of both corners are equal (corners are above eachother)
-            int searchDir = ((lookDir - (lookDir % 2)) % 4) + 2; //converts {2, 3, 4, 5} to {4, 4, 2, 2}
             for (int dir = searchDir; dir < searchDir+2 ; dir++) {
                 int tempX = x2;
                 int tempZ = z2;
-                for (int i = 0; i < maxPortalSize; i++) { //check for maximal portal size
+                for (int i = 0; i < QCraft.maxPortalSize + 1; i++) { //check for maximal portal size
                     tempX += Facing.offsetsXForSide[ dir ];
                     tempZ += Facing.offsetsZForSide[ dir ];
                     if (!isGlass(tempX, y1, tempZ) || !isGlass(tempX, y2,tempZ)) { //once connected glass stops
                         break;
                     }
                 }
-                if (isGlass(tempX, y1, tempZ) || isGlass(tempX, y2, tempZ) || Math.abs(x1 - tempX) < 3 || Math.abs(z1 - tempZ) < 3) { //if not both are non-glass OR the portal wouldn't be high enough
+                if (isGlass(tempX, y1, tempZ) || isGlass(tempX, y2, tempZ) || (Math.abs(x1 - tempX) < 3 && Math.abs(z1 - tempZ) < 3) ) { //if not both are non-glass OR the portal wouldn't be high enough
                     continue;
                 }
                 if (isPortalCorner(tempX, y1, tempZ, lookDir) && isPortalCorner(tempX, y2, tempZ, lookDir)) {
-                    returnValue.add(new PortalLocation(x1, y1, z1, tempX, y2, tempZ, worldObj.provider.dimensionId));
+                    //check for completeness of last vertical border.
+                    for(int i = Math.min(y1, y2) + 1; i < Math.max(y1, y2); i++ ) {
+                        if (!isGlass(tempX, i, tempZ )) {
+                            break;
+                        }
+                        if (i == Math.max(y1, y2) - 1) {
+                            returnValue.add(new PortalLocation(x1, y1, z1, tempX, y2, tempZ, worldObj.provider.dimensionId));
+                        }
+                    }                    
                 }
             }            
         }
@@ -1247,7 +1278,8 @@ public class TileEntityQuantumComputer extends TileEntity
 
     private PortalLocation findPortal() 
     {
-        PortalLocation result = null;
+        ArrayList<PortalLocation> portalLocations = new ArrayList();
+        tooManyPossiblePortals = false;
         for( int dir = 0; dir < 6; ++dir )
         {
             // See if this adjoining block is part of a portal:
@@ -1257,25 +1289,41 @@ public class TileEntityQuantumComputer extends TileEntity
             if( !isGlass( x, y, z ) && !isPortalCorner( x, y, z, 2 ) && !isPortalCorner( x, y, z, 4 ) )
             {
                 continue;
-            }
+            }            
             
-            ArrayList<PortalLocation> portalLocations = findPortalsAt(x, y, z);
-            if (portalLocations.size() < 1) {
-                //@todo; //frame incomplete message?
-            } else if (portalLocations.size() == 2) {
-                if( isPortalCorner( x, y, z, 2 ) || isPortalCorner( x, y, z, 4 ) )
-                {
-                    result = portalLocations.get(0);
-                } else {
-                    //@todo; //Too many portals were found message
-                }
-            } else if (portalLocations.size() > 2) {
-                //@todo; //Too many portals were found message
-            } else {
-                result = portalLocations.get(0);
+            ArrayList<PortalLocation> tempLocations = findPortalsAt(x, y, z);
+            if ( (tempLocations.size() == 2 && ! (isPortalCorner( x, y, z, 2 ) || isPortalCorner( x, y, z, 4 ) ) ) || tempLocations.size() > 2)  {
+                    tooManyPossiblePortals = true;
+                    return null;
+            }
+            portalLocations.addAll(tempLocations);
+            if (portalLocations.size() > 2) {
+                tooManyPossiblePortals = true;
+                return null;
             }
         }
-        return result;
+        
+        if (portalLocations.size() < 1) {
+            return null;
+        } else if (portalLocations.size() == 2) {
+            PortalLocation portal1 = portalLocations.get(0);
+            PortalLocation portal2 = portalLocations.get(1);            
+            
+            if( Math.min(portal1.m_x1,  portal1.m_x2) == Math.min(portal2.m_x1,  portal2.m_x2) &&
+                    Math.min(portal1.m_y1,  portal1.m_y2) == Math.min(portal2.m_y1,  portal2.m_y2) &&
+                    Math.min(portal1.m_z1,  portal1.m_z2) == Math.min(portal2.m_z1,  portal2.m_z2))
+            {
+                return portalLocations.get(0);
+            } else {
+                tooManyPossiblePortals = true;
+                return null;
+            }
+        } else if (portalLocations.size() > 2) {
+            tooManyPossiblePortals = true;
+            return null;
+        } else {
+            return portalLocations.get(0);
+        }
     }
 
     private boolean isPortalClear( PortalLocation portal )
@@ -1364,6 +1412,11 @@ public class TileEntityQuantumComputer extends TileEntity
         }
 
         PortalLocation location = getPortal();
+        if(tooManyPossiblePortals) {
+            tooManyPossiblePortals = false;
+            return TeleportError.MultiplePossiblePortalsFound;
+        }
+        
         if( location == null )
         {
             return TeleportError.FrameIncomplete;
@@ -1722,9 +1775,9 @@ public class TileEntityQuantumComputer extends TileEntity
 
         if( location != null )
         {
-            double xPos = ((double)location.m_x1 + location.m_x2) / 2; //@todo; make one spawn in the middle instead of at the edge of the portal.
-            double yPos = (double) Math.min(location.m_x1, location.m_y1) + 1;
-            double zPos = ((double)location.m_z1 + location.m_z2) / 2;
+            double xPos = ((double)location.m_x1 + location.m_x2 + 1) / 2;
+            double yPos = (double) Math.min(location.m_y1, location.m_y2) + 1;
+            double zPos = ((double)location.m_z1 + location.m_z2 + 1) / 2;
             if( location.m_dimensionID == player.dimension )
             {
                 player.timeUntilPortal = 40;

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2014 Google Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.qcraft.shared.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -48,6 +49,7 @@ import net.minecraftforge.common.config.Property;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.*;
+import net.minecraft.item.Item;
 
 ///////////////
 // UNIVERSAL //
@@ -846,6 +848,17 @@ public class QCraft
                     {
                         NBTTagCompound item = items.getCompoundTagAt( i );
                         ItemStack stack = ItemStack.loadItemStackFromNBT( item );
+                        
+                        String oldName = item.getString("Name");
+                        GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
+                        String newName = uniqueId.modId + ":" + uniqueId.name;
+                        if (! oldName.equals(newName)) {
+                            GameRegistry.UniqueIdentifier oldUniqueId = new GameRegistry.UniqueIdentifier(oldName);
+                            int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));
+                            item.setShort("id", (short) newID);
+                            stack = ItemStack.loadItemStackFromNBT( item );
+                        }
+                        
                         if( !entityPlayer.inventory.addItemStackToInventory( stack ) )
                         {
                             entityPlayer.entityDropItem( stack, 1.5f );

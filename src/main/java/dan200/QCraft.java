@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2014 Google Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,6 +94,7 @@ public class QCraft
         public static ItemQuantumDust quantumDust;
         public static ItemEOS eos;
         public static ItemQuantumGoggles quantumGoggles;
+        public static ItemMissing missingItem;
     }
 
     // Networking
@@ -846,17 +847,21 @@ public class QCraft
                     QCraft.log( "Adding " + items.tagCount() + " items to " + entityPlayer.getDisplayName() + "'s inventory" );
                     for( int i=0; i<items.tagCount(); ++i )
                     {
-                        NBTTagCompound item = items.getCompoundTagAt( i );
-                        ItemStack stack = ItemStack.loadItemStackFromNBT( item );
+                        NBTTagCompound itemNBT = items.getCompoundTagAt( i );
+                        ItemStack stack = ItemStack.loadItemStackFromNBT( itemNBT );
                         
-                        String oldName = item.getString("Name");
+                        String oldName = itemNBT.getString("Name");
                         GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
                         String newName = uniqueId.modId + ":" + uniqueId.name;
                         if (! oldName.equals(newName)) {
                             GameRegistry.UniqueIdentifier oldUniqueId = new GameRegistry.UniqueIdentifier(oldName);
                             int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));
-                            item.setShort("id", (short) newID);
-                            stack = ItemStack.loadItemStackFromNBT( item );
+                            if (newID < 1) { //0 and -1 indicate an error, and lower IDs are even worse I guess :P                               
+                                stack = new ItemStack(new ItemMissing(itemNBT)); //Wrap the item in a dummy item
+                            } else {
+                                itemNBT.setShort("id", (short) newID);
+                                stack = ItemStack.loadItemStackFromNBT( itemNBT );
+                            }
                         }
                         
                         if( !entityPlayer.inventory.addItemStackToInventory( stack ) )

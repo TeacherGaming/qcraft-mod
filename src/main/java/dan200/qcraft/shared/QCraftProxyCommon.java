@@ -158,6 +158,10 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
         // Quantum Goggles item
         QCraft.Items.quantumGoggles = new ItemQuantumGoggles();
         GameRegistry.registerItem( QCraft.Items.quantumGoggles, "goggles" );
+        
+        // Dummy item to contain (modded) items that were sent to this server, but don't exist here
+        QCraft.Items.missingItem = new ItemMissing();
+        GameRegistry.registerItem( QCraft.Items.missingItem, "itemMissing" );
 
         // RECIPES
 

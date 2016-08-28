@@ -843,6 +843,7 @@ public class TileEntityQuantumComputer extends TileEntity
             }
             EntanglementSavedData.get(this.getWorldObj()).markDirty(); //Notify that this needs to be saved on world save
         }
+        tooManyPossiblePortals = false;
     }
 
     private void unregisterPortal()
@@ -1397,6 +1398,7 @@ public class TileEntityQuantumComputer extends TileEntity
             return TeleportError.FrameIncomplete;
         }
 
+        tooManyPossiblePortals = false;
         PortalLocation location = getPortal();
         if(tooManyPossiblePortals) {
             tooManyPossiblePortals = false;
@@ -1700,10 +1702,15 @@ public class TileEntityQuantumComputer extends TileEntity
 
                     // Store items
                     NBTTagCompound itemTag = new NBTTagCompound();
-                    GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
-                    String itemName = uniqueId.modId + ":" + uniqueId.name;
-                    itemTag.setString("Name", itemName);
-                    stack.writeToNBT( itemTag );
+                    if (stack.getItem() instanceof ItemMissing) {
+                        ItemMissing missingItem = (ItemMissing) stack.getItem();
+                        itemTag = missingItem.missingToNBT();
+                    } else {
+                        GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
+                        String itemName = uniqueId.modId + ":" + uniqueId.name;
+                        itemTag.setString("Name", itemName);
+                        stack.writeToNBT( itemTag );
+                    }
                     items.appendTag( itemTag );
 
                     // Remove items

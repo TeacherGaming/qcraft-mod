@@ -26,6 +26,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.qcraft.shared.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -48,6 +49,7 @@ import net.minecraftforge.common.config.Property;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.*;
+import net.minecraft.item.Item;
 
 ///////////////
 // UNIVERSAL //
@@ -74,6 +76,7 @@ public class QCraft
     public static boolean letPlayersEditPortalServerList = false;
     public static boolean letAdminsVerifyPortalServers = true;
     public static boolean letPlayersVerifyPortalServers = false;
+    public static int maxPortalSize = 5;
 
     // Blocks and Items
     public static class Blocks
@@ -91,6 +94,7 @@ public class QCraft
         public static ItemQuantumDust quantumDust;
         public static ItemEOS eos;
         public static ItemQuantumGoggles quantumGoggles;
+        public static ItemMissing missingItem;
     }
 
     // Networking
@@ -171,6 +175,19 @@ public class QCraft
         prop = config.get( Configuration.CATEGORY_GENERAL, "letPlayersVerifyPortalServers", letPlayersVerifyPortalServers );
         prop.comment = "Set whether players can verify an inter-server portal link";
         letPlayersVerifyPortalServers = prop.getBoolean( letPlayersVerifyPortalServers );
+        
+        prop = config.get( Configuration.CATEGORY_GENERAL, "maxPortalSize", maxPortalSize );
+        prop.comment = "Set the maximum height and width for the Quantum Portal inside the frame in blocks. [min: 3, max: 16, def: 5]";
+        int temp = prop.getInt( maxPortalSize );
+        if (temp < 3) {
+            maxPortalSize = 3;
+            prop.set(maxPortalSize);
+        } else if (temp > 16) {
+            maxPortalSize = 16;
+            prop.set(maxPortalSize);
+        } else {
+            maxPortalSize = prop.getInt( maxPortalSize );
+        }            
 
         // None
 
@@ -830,8 +847,23 @@ public class QCraft
                     QCraft.log( "Adding " + items.tagCount() + " items to " + entityPlayer.getDisplayName() + "'s inventory" );
                     for( int i=0; i<items.tagCount(); ++i )
                     {
-                        NBTTagCompound item = items.getCompoundTagAt( i );
-                        ItemStack stack = ItemStack.loadItemStackFromNBT( item );
+                        NBTTagCompound itemNBT = items.getCompoundTagAt( i );
+                        ItemStack stack = ItemStack.loadItemStackFromNBT( itemNBT );
+                        
+                        String oldName = itemNBT.getString("Name");
+                        GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
+                        String newName = uniqueId.modId + ":" + uniqueId.name;
+                        if (! oldName.equals(newName)) {
+                            GameRegistry.UniqueIdentifier oldUniqueId = new GameRegistry.UniqueIdentifier(oldName);
+                            int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));
+                            if (newID < 1) { //0 and -1 indicate an error, and lower IDs are even worse I guess :P                               
+                                stack = new ItemStack(new ItemMissing(itemNBT)); //Wrap the item in a dummy item
+                            } else {
+                                itemNBT.setShort("id", (short) newID);
+                                stack = ItemStack.loadItemStackFromNBT( itemNBT );
+                            }
+                        }
+                        
                         if( !entityPlayer.inventory.addItemStackToInventory( stack ) )
                         {
                             entityPlayer.entityDropItem( stack, 1.5f );

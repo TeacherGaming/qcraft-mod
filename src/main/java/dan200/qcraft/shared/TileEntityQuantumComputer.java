@@ -1702,7 +1702,7 @@ public class TileEntityQuantumComputer extends TileEntity
 
                     // Store items
                     NBTTagCompound itemTag = new NBTTagCompound();
-                    if (stack.getItem() instanceof ItemMissing) {
+                    if (stack.getItem() == QCraft.Items.missingItem) {
                         itemTag = stack.stackTagCompound;
                     } else {
                         GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());

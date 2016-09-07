@@ -858,7 +858,7 @@ public class QCraft
                             int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));
                             if (newID < 1) { //0 and -1 indicate an error, and lower IDs are even worse I guess :P                               
                                 stack = new ItemStack(QCraft.Items.missingItem);
-                                stack.setTagInfo("tag", itemNBT);//Wrap the item in the dummy item
+                                stack.stackTagCompound = itemNBT;//Wrap the item in the dummy item
                             } else {
                                 itemNBT.setShort("id", (short) newID);
                                 stack = ItemStack.loadItemStackFromNBT( itemNBT );

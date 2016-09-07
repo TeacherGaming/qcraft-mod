@@ -1703,8 +1703,7 @@ public class TileEntityQuantumComputer extends TileEntity
                     // Store items
                     NBTTagCompound itemTag = new NBTTagCompound();
                     if (stack.getItem() instanceof ItemMissing) {
-                        ItemMissing missingItem = (ItemMissing) stack.getItem();
-                        itemTag = missingItem.missingToNBT();
+                        itemTag = stack.stackTagCompound;
                     } else {
                         GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
                         String itemName = uniqueId.modId + ":" + uniqueId.name;

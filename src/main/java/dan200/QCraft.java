@@ -851,8 +851,11 @@ public class QCraft
                         ItemStack stack = ItemStack.loadItemStackFromNBT( itemNBT );
                         
                         String oldName = itemNBT.getString("Name");
-                        GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
-                        String newName = uniqueId.modId + ":" + uniqueId.name;
+                        String newName = "";
+                        if (stack != null) {
+                            GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
+                            newName = uniqueId.modId + ":" + uniqueId.name;
+                        }                        
                         if (! oldName.equals(newName)) {
                             GameRegistry.UniqueIdentifier oldUniqueId = new GameRegistry.UniqueIdentifier(oldName);
                             int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));

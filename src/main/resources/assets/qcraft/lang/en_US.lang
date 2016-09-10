@@ -14,6 +14,7 @@ item.qcraft:eoo.name=Essence of Observation
 item.qcraft:eoe.name=Essence of Entanglement
 item.qcraft:goggles.name=Quantum Goggles
 item.qcraft:ao_goggles.name=Anti-Observation Goggles
+item.qcraft:itemMissing.name=Missing Item Container
 
 gui.qcraft:computer.energize=Energize
 gui.qcraft:computer.deenergize=De-energize

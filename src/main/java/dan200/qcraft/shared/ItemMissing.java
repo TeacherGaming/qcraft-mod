@@ -16,55 +16,33 @@ limitations under the License.
 
 package dan200.qcraft.shared;
 
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.IIcon;
 
 /**
  *
  * @author Mathijs Riezebos
  */
 public class ItemMissing extends Item 
-{
-    private String wrappedItemName;
-    private int wrappedItemId;
-    private int wrappedItemCount;
-    private int wrappedItemDamage;
-    private NBTTagCompound wrappedItemTag;
+{    
+    private static IIcon s_icon;
     
     public ItemMissing() 
     {
-        setMaxStackSize( 1 );
+        super();
         setUnlocalizedName( "qcraft:itemMissing" );
-        setCreativeTab( null );
     }
     
-    public ItemMissing(NBTTagCompound itemNBT) {
-        this();
-        
-        this.wrappedItemName = itemNBT.getString("Name");
-        this.wrappedItemId = itemNBT.getShort("id");
-        this.wrappedItemCount = itemNBT.getByte("Count");
-        this.wrappedItemDamage = itemNBT.getShort("Damage");
-        if (itemNBT.hasKey("tag", 10))
-        {
-            this.wrappedItemTag = itemNBT.getCompoundTag("tag");
-        } 
+    @Override
+    public void registerIcons( IIconRegister iconRegister )
+    {
+        s_icon = iconRegister.registerIcon( "qcraft:missing" );
     }
-    
-    public NBTTagCompound missingToNBT() {
-        NBTTagCompound itemTag = new NBTTagCompound();
-        
-        //[copied from net.minecraft.item.Item]
-        itemTag.setString("Name", this.wrappedItemName);
-        itemTag.setShort("id", (short) this.wrappedItemId);
-        itemTag.setByte("Count", (byte) this.wrappedItemCount);
-        itemTag.setShort("Damage", (short) this.wrappedItemDamage);
 
-        if (this.wrappedItemTag != null)
-        {
-            itemTag.setTag("tag", this.wrappedItemTag);
-        }
-        return itemTag;
-        //[/copied]
+    @Override
+    public IIcon getIconFromDamage( int damage )
+    {
+        return s_icon;
     }
 }

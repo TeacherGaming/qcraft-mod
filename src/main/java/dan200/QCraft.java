@@ -851,13 +851,17 @@ public class QCraft
                         ItemStack stack = ItemStack.loadItemStackFromNBT( itemNBT );
                         
                         String oldName = itemNBT.getString("Name");
-                        GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
-                        String newName = uniqueId.modId + ":" + uniqueId.name;
+                        String newName = "";
+                        if (stack != null) {
+                            GameRegistry.UniqueIdentifier uniqueId = GameRegistry.findUniqueIdentifierFor(stack.getItem());
+                            newName = uniqueId.modId + ":" + uniqueId.name;
+                        }                        
                         if (! oldName.equals(newName)) {
                             GameRegistry.UniqueIdentifier oldUniqueId = new GameRegistry.UniqueIdentifier(oldName);
                             int newID = Item.getIdFromItem(GameRegistry.findItem(oldUniqueId.modId, oldUniqueId.name));
                             if (newID < 1) { //0 and -1 indicate an error, and lower IDs are even worse I guess :P                               
-                                stack = new ItemStack(new ItemMissing(itemNBT)); //Wrap the item in a dummy item
+                                stack = new ItemStack(QCraft.Items.missingItem);
+                                stack.stackTagCompound = itemNBT;//Wrap the item in the dummy item
                             } else {
                                 itemNBT.setShort("id", (short) newID);
                                 stack = ItemStack.loadItemStackFromNBT( itemNBT );

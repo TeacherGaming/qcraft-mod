@@ -161,7 +161,7 @@ public abstract class QCraftProxyCommon implements IQCraftProxy
         
         // Dummy item to contain (modded) items that were sent to this server, but don't exist here
         QCraft.Items.missingItem = new ItemMissing();
-        GameRegistry.registerItem( QCraft.Items.missingItem, "itemMissing" );
+        GameRegistry.registerItem( QCraft.Items.missingItem, "missing" );
 
         // RECIPES
 

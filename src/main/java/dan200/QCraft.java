@@ -190,10 +190,10 @@ public class QCraft
         prop.set(maxPortalSize);
         
         prop = config.get( Configuration.CATEGORY_GENERAL, "maxQTPSize", maxQTPSize );
-        prop.comment = "Set the maximum distance from the Quantum Computer that the quantization or teleportation field can extend in blocks. (3 means that there are 2 blocks between the computer and the pillar) [min: 3, max: 16, def: 8]";
+        prop.comment = "Set the maximum distance from the Quantum Computer that the quantization or teleportation field can extend in blocks. (3 means that there are 2 blocks between the computer and the pillar) [min: 1, max: 16, def: 8]";
         temp = prop.getInt( maxQTPSize );
-        if (temp < 3) {
-            maxQTPSize = 3;
+        if (temp < 1) {
+            maxQTPSize = 1;
         } else if (temp > 16) {
             maxQTPSize = 16;
         } else {

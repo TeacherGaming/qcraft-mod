@@ -52,7 +52,6 @@ public class TileEntityQuantumComputer extends TileEntity
 {
     public static final EntanglementRegistry<TileEntityQuantumComputer> ComputerRegistry = new EntanglementRegistry<TileEntityQuantumComputer>();
     public static final EntanglementRegistry<TileEntityQuantumComputer> ClientComputerRegistry = new EntanglementRegistry<TileEntityQuantumComputer>();
-    public static final int RANGE = 8;
     private static boolean tooManyPossiblePortals = false;
 
     public static EntanglementRegistry<TileEntityQuantumComputer> getEntanglementRegistry( World world )
@@ -372,7 +371,7 @@ public class TileEntityQuantumComputer extends TileEntity
         shape.m_yMax = 0;
         shape.m_zMin = -99;
         shape.m_zMax = -99;
-        for( int i = 0; i < RANGE; ++i )
+        for( int i = 0; i < QCraft.maxQTPSize; ++i )
         {
             if( shape.m_xMin == -99 && isPillarBase( xCoord - i - 1, yCoord, zCoord, 5 ) )
             {
@@ -398,7 +397,7 @@ public class TileEntityQuantumComputer extends TileEntity
                 shape.m_zMax != -99 )
         {
             // Find Y Min
-            for( int i = 1; i < RANGE; ++i )
+            for( int i = 1; i < QCraft.maxQTPSize; ++i )
             {
                 if( isPillar( xCoord + shape.m_xMin - 1, yCoord - i, zCoord ) &&
                         isPillar( xCoord + shape.m_xMax + 1, yCoord - i, zCoord ) &&
@@ -414,7 +413,7 @@ public class TileEntityQuantumComputer extends TileEntity
             }
 
             // Find Y Max
-            for( int i = 1; i < RANGE; ++i )
+            for( int i = 1; i < QCraft.maxQTPSize; ++i )
             {
                 if( isPillar( xCoord + shape.m_xMin - 1, yCoord + i, zCoord ) &&
                         isPillar( xCoord + shape.m_xMax + 1, yCoord + i, zCoord ) &&
